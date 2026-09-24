@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - URLZen</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f8fafc;
+      color: #0f172a;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 260px;
+      background-color: #ffffff;
+      border-right: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 1.5rem;
+    }
+
+    .brand {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #2563eb;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .nav-item a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      color: #64748b;
+      text-decoration: none;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .nav-item.active a, .nav-item a:hover {
+      background-color: #eff6ff;
+      color: #2563eb;
+    }
+
+    .btn-logout {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-logout:hover {
+      background: #fee2e2;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .user-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #ffffff;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .view-panel {
+      display: none;
+    }
+
+    .view-panel.active {
+      display: block;
+    }
+
+    .card {
+      background: #ffffff;
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+      margin-bottom: 1.5rem;
+    }
+
+    .card h2 {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      color: #0f172a;
+    }
+
+    .card-header-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .card-header-flex h2 {
+      margin-bottom: 0;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    @media (min-width: 768px) {
+      .create-link-grid {
+        grid-template-columns: 2fr 1fr 1fr;
+      }
+      .create-folder-grid {
+        grid-template-columns: 2fr 1fr;
+      }
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .form-group label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #475569;
+    }
+
+    .input-box {
+      display: flex;
+      align-items: center;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 0.6rem 0.8rem;
+      background: #ffffff;
+    }
+
+    .input-box i {
+      color: #94a3b8;
+      margin-right: 0.5rem;
+    }
+
+    .input-box input, .input-box select {
+      border: none;
+      outline: none;
+      width: 100%;
+      font-size: 0.95rem;
+      background: transparent;
+    }
+
+    .domain-prefix {
+      color: #64748b;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-right: 0.2rem;
+    }
+
+    .btn-primary {
+      background-color: #2563eb;
+      color: #ffffff;
+      border: none;
+      padding: 0.75rem 1.25rem;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover {
+      background-color: #1d4ed8;
+    }
+
+    .btn-secondary {
+      background-color: #f1f5f9;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn-secondary:hover {
+      background-color: #e2e8f0;
+      color: #0f172a;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 1rem;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background-color: #f8fafc;
+      color: #475569;
+      font-weight: 600;
+    }
+
+    tr.hidden-row {
+      display: none;
+    }
+
+    .link-long {
+      max-width: 220px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #64748b;
+    }
+
+    .link-short {
+      color: #2563eb;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .link-short:hover {
+      text-decoration: underline;
+    }
+
+    .badge-folder {
+      background-color: #eff6ff;
+      color: #2563eb;
+      padding: 0.25rem 0.6rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      cursor: pointer;
+    }
+
+    .btn-delete-link {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .btn-delete-link:hover {
+      color: #dc2626;
+      background-color: #fef2f2;
+    }
+
+    .folder-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .folder-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      padding: 1.25rem;
+      border-radius: 10px;
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .folder-card:hover {
+      border-color: #2563eb;
+      transform: translateY(-2px);
+    }
+
+    .folder-card i.folder-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .btn-delete-folder {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: none;
+      border: none;
+      color: #cbd5e1;
+      font-size: 0.95rem;
+      cursor: pointer;
+      padding: 0.3rem;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .btn-delete-folder:hover {
+      color: #dc2626;
+      background: #fef2f2;
+    }
+
+    input[type="color"] {
+      -webkit-appearance: none;
+      border: none;
+      width: 100%;
+      height: 24px;
+      cursor: pointer;
+      background: none;
+    }
+
+    .danger-card {
+      border: 1px solid #fecaca;
+      background: #fff5f5;
+    }
+
+    .btn-danger {
+      background-color: #dc2626;
+      color: #ffffff;
+      border: none;
+      padding: 0.75rem 1.25rem;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-danger:hover {
+      background-color: #b91c1c;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: #ffffff;
+      width: 100%;
+      max-width: 480px;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .modal-header h3 {
+      font-size: 1.1rem;
+      color: #0f172a;
+    }
+
+    .btn-close {
+      background: none;
+      border: none;
+      font-size: 1.25rem;
+      color: #64748b;
+      cursor: pointer;
+    }
+
+    .country-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .country-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 0.8rem;
+      background: #f8fafc;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+
+    .country-item span {
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div>
+      <a href="#" class="brand">
+        <i class="fa-solid fa-link"></i> URLZen
+      </a>
+      <ul class="nav-list">
+        <li class="nav-item active">
+          <a href="#" onclick="switchTab('links-tab', this)">
+            <i class="fa-solid fa-list-ul"></i> My Links
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" onclick="switchTab('folders-tab', this)">
+            <i class="fa-solid fa-folder-open"></i> Folders
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" onclick="switchTab('settings-tab', this)">
+            <i class="fa-solid fa-gear"></i> Account Settings
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <button class="btn-logout" onclick="handleLogout()">
+      <i class="fa-solid fa-right-from-bracket"></i> Logout
+    </button>
+  </aside>
+
+  <main class="main-content">
+    <div class="top-bar">
+      <h1 id="page-title">My Links</h1>
+      <div class="user-badge">
+        <i class="fa-solid fa-circle-user"></i> <span id="display-username">johndoe</span>
+      </div>
+    </div>
+
+    <div id="links-tab" class="view-panel active">
+      <div class="card">
+        <h2><i class="fa-solid fa-plus"></i> Create Short Link</h2>
+        <form onsubmit="handleCreateLink(event)" class="form-grid create-link-grid">
+          
+          <div class="form-group">
+            <label>Destination URL</label>
+            <div class="input-box">
+              <i class="fa-solid fa-globe"></i>
+              <input type="url" id="target-url" placeholder="https://example.com/long-page-path" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Custom Alias</label>
+            <div class="input-box">
+              <span class="domain-prefix">urlzen.com/</span>
+              <input type="text" id="custom-alias" placeholder="linkname" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Select Folder</label>
+            <div class="input-box">
+              <i class="fa-solid fa-folder"></i>
+              <select id="folder-select">
+                <option value="Unassigned">Unassigned</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Social Media">Social Media</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="grid-column: 1 / -1; margin-top: 0.5rem;">
+            <button type="submit" class="btn-primary">
+              <i class="fa-solid fa-bolt"></i> Shorten Link
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-header-flex">
+          <h2 id="table-title"><i class="fa-solid fa-chart-simple"></i> Active Links</h2>
+          <button id="reset-filter-btn" class="btn-secondary" onclick="showAllLinks()">
+            <i class="fa-solid fa-xmark"></i> Show All Links
+          </button>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Short Link</th>
+                <th>Original URL</th>
+                <th>Total Clicks</th>
+                <th>Top Location</th>
+                <th>Folder</th>
+                <th style="text-align: center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="links-table-body">
+              <tr data-id="link-1" data-folder="Marketing">
+                <td><span class="link-short" onclick="openAnalytics('link-1')">urlzen.com/summer-sale</span></td>
+                <td class="link-long">https://example.com/products/deals/summer2026</td>
+                <td><strong id="clicks-link-1">3</strong></td>
+                <td><i class="fa-solid fa-location-dot"></i> <span id="top-link-1">U.S. (2 clicks)</span></td>
+                <td><span class="badge-folder" onclick="filterByFolder('Marketing')"><i class="fa-solid fa-folder"></i> Marketing</span></td>
+                <td style="text-align: center;">
+                  <button class="btn-delete-link" onclick="deleteLink('link-1')" title="Delete Short Link">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr data-id="link-2" data-folder="Social Media">
+                <td><span class="link-short" onclick="openAnalytics('link-2')">urlzen.com/bio-link</span></td>
+                <td class="link-long">https://instagram.com/mybrand/profile</td>
+                <td><strong id="clicks-link-2">850</strong></td>
+                <td><i class="fa-solid fa-location-dot"></i> <span id="top-link-2">Germany (420 clicks)</span></td>
+                <td><span class="badge-folder" onclick="filterByFolder('Social Media')"><i class="fa-solid fa-folder"></i> Social Media</span></td>
+                <td style="text-align: center;">
+                  <button class="btn-delete-link" onclick="deleteLink('link-2')" title="Delete Short Link">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="folders-tab" class="view-panel">
+      <div class="card">
+        <h2><i class="fa-solid fa-folder-plus"></i> Create New Folder</h2>
+        <form onsubmit="handleCreateFolder(event)" class="form-grid create-folder-grid">
+          <div class="form-group">
+            <label>Folder Name</label>
+            <div class="input-box">
+              <i class="fa-solid fa-folder"></i>
+              <input type="text" id="folder-name-input" placeholder="e.g. Email Campaigns" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Folder Color</label>
+            <div class="input-box">
+              <input type="color" id="folder-color-input" value="#2563eb" />
+            </div>
+          </div>
+
+          <div style="grid-column: 1 / -1; margin-top: 0.5rem;">
+            <button type="submit" class="btn-primary">
+              <i class="fa-solid fa-plus"></i> Add Folder
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2><i class="fa-solid fa-folder-closed"></i> Your Folders</h2>
+        <div class="folder-grid" id="folder-grid-container">
+          <div class="folder-card" id="folder-card-Marketing" onclick="filterByFolder('Marketing')">
+            <button class="btn-delete-folder" onclick="deleteFolder(event, 'Marketing')" title="Delete Folder">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+            <i class="fa-solid fa-folder-open folder-icon" style="color: #2563eb;"></i>
+            <h3>Marketing</h3>
+            <p style="color:#64748b; font-size:0.85rem; margin-top:0.2rem;" id="count-Marketing">1 Shortened Link</p>
+          </div>
+          <div class="folder-card" id="folder-card-Social Media" onclick="filterByFolder('Social Media')">
+            <button class="btn-delete-folder" onclick="deleteFolder(event, 'Social Media')" title="Delete Folder">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+            <i class="fa-solid fa-folder-open folder-icon" style="color: #059669;"></i>
+            <h3>Social Media</h3>
+            <p style="color:#64748b; font-size:0.85rem; margin-top:0.2rem;" id="count-Social Media">1 Shortened Link</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="settings-tab" class="view-panel">
+      <div class="card">
+        <h2><i class="fa-solid fa-user-pen"></i> Update Credentials</h2>
+        <form onsubmit="handleUpdateProfile(event)" style="max-width: 400px;">
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label>Username</label>
+            <div class="input-box">
+              <i class="fa-solid fa-user"></i>
+              <input type="text" id="setting-username" value="johndoe" required />
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label>New Password</label>
+            <div class="input-box">
+              <i class="fa-solid fa-lock"></i>
+              <input type="password" id="setting-password" placeholder="Leave empty to keep current" />
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary">Save Changes</button>
+        </form>
+      </div>
+
+      <div class="card danger-card">
+        <h2 style="color: #dc2626;"><i class="fa-solid fa-triangle-exclamation"></i> Danger Zone</h2>
+        <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1rem;">
+          Deleting your account will immediately remove all your shortened links and tracking history.
+        </p>
+        <button class="btn-danger" onclick="handleDeleteAccount()">
+          <i class="fa-solid fa-trash-can"></i> Delete Account
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="analytics-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-alias-title"><i class="fa-solid fa-earth-americas"></i> Geographic Breakdown</h3>
+        <button class="btn-close" onclick="closeAnalytics()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <p style="color: #64748b; font-size: 0.85rem;" id="modal-total-clicks">Total Clicks: 0</p>
+      
+      <ul class="country-list" id="modal-country-list">
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const linksData = {
+      "link-1": {
+        alias: "urlzen.com/summer-sale",
+        countries: {
+          "U.S.": 2,
+          "Sweden": 1
+        }
+      },
+      "link-2": {
+        alias: "urlzen.com/bio-link",
+        countries: {
+          "Germany": 420,
+          "U.S.": 280,
+          "United Kingdom": 150
+        }
+      }
+    };
+
+    function switchTab(tabId, element) {
+      document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      
+      document.getElementById(tabId).classList.add('active');
+      if (element) {
+        element.parentElement.classList.add('active');
+      }
+
+      const titles = {
+        'links-tab': 'My Links',
+        'folders-tab': 'Link Folders',
+        'settings-tab': 'Account Settings'
+      };
+      document.getElementById('page-title').innerText = titles[tabId];
+    }
+
+    function deleteLink(linkId) {
+      if (!confirm('Are you sure you want to delete this short link?')) return;
+
+      const row = document.querySelector(`tr[data-id="${linkId}"]`);
+      if (row) {
+        const folder = row.getAttribute('data-folder');
+        row.remove();
+        delete linksData[linkId];
+        updateFolderCount(folder);
+      }
+    }
+
+    function deleteFolder(e, folderName) {
+      e.stopPropagation();
+
+      if (!confirm(`Are you sure you want to delete the folder "${folderName}"? Links in this folder will be set to Unassigned.`)) return;
+
+      const card = document.getElementById(`folder-card-${folderName}`);
+      if (card) card.remove();
+
+      const select = document.getElementById('folder-select');
+      for (let i = 0; i < select.options.length; i++) {
+        if (select.options[i].value === folderName) {
+          select.remove(i);
+          break;
+        }
+      }
+
+      const rows = document.querySelectorAll(`#links-table-body tr[data-folder="${folderName}"]`);
+      rows.forEach(row => {
+        row.setAttribute('data-folder', 'Unassigned');
+        const badge = row.querySelector('.badge-folder');
+        if (badge) {
+          badge.setAttribute('onclick', "filterByFolder('Unassigned')");
+          badge.innerHTML = `<i class="fa-solid fa-folder"></i> Unassigned`;
+        }
+      });
+    }
+
+    function openAnalytics(linkId) {
+      const data = linksData[linkId];
+      if (!data) return;
+
+      document.getElementById('modal-alias-title').innerText = data.alias;
+
+      let totalClicks = 0;
+      let sortedCountries = [];
+
+      for (const [country, clicks] of Object.entries(data.countries)) {
+        totalClicks += clicks;
+        sortedCountries.push({ country, clicks });
+      }
+
+      sortedCountries.sort((a, b) => b.clicks - a.clicks);
+
+      document.getElementById('modal-total-clicks').innerText = `Total Clicks: ${totalClicks}`;
+
+      const listContainer = document.getElementById('modal-country-list');
+      listContainer.innerHTML = '';
+
+      if (sortedCountries.length === 0) {
+        listContainer.innerHTML = '<li style="color: #64748b; font-size: 0.9rem;">No clicks recorded yet.</li>';
+      } else {
+        sortedCountries.forEach(item => {
+          const li = document.createElement('li');
+          li.className = 'country-item';
+          li.innerHTML = `
+            <div><i class="fa-solid fa-location-dot" style="color: #2563eb;"></i> ${item.country}</div>
+            <span>${item.clicks} click${item.clicks === 1 ? '' : 's'}</span>
+          `;
+          listContainer.appendChild(li);
+        });
+      }
+
+      document.getElementById('analytics-modal').classList.add('active');
+    }
+
+    function closeAnalytics() {
+      document.getElementById('analytics-modal').classList.remove('active');
+    }
+
+    function filterByFolder(folderName) {
+      switchTab('links-tab', document.querySelectorAll('.nav-item')[0].children[0]);
+
+      const rows = document.querySelectorAll('#links-table-body tr');
+      rows.forEach(row => {
+        if (row.getAttribute('data-folder') === folderName) {
+          row.classList.remove('hidden-row');
+        } else {
+          row.classList.add('hidden-row');
+        }
+      });
+
+      document.getElementById('table-title').innerHTML = `<i class="fa-solid fa-folder-open"></i> Folder: ${folderName}`;
+      document.getElementById('reset-filter-btn').style.display = 'inline-flex';
+    }
+
+    function showAllLinks() {
+      const rows = document.querySelectorAll('#links-table-body tr');
+      rows.forEach(row => row.classList.remove('hidden-row'));
+
+      document.getElementById('table-title').innerHTML = `<i class="fa-solid fa-chart-simple"></i> Active Links`;
+      document.getElementById('reset-filter-btn').style.display = 'none';
+    }
+
+    function updateFolderCount(folderName) {
+      const count = document.querySelectorAll(`#links-table-body tr[data-folder="${folderName}"]`).length;
+      const countEl = document.getElementById(`count-${folderName}`);
+      if (countEl) {
+        countEl.innerText = `${count} Shortened Link${count === 1 ? '' : 's'}`;
+      }
+    }
+
+    function handleCreateFolder(e) {
+      e.preventDefault();
+      const folderName = document.getElementById('folder-name-input').value.trim();
+      const folderColor = document.getElementById('folder-color-input').value;
+
+      if (!folderName) return;
+
+      const folderGrid = document.getElementById('folder-grid-container');
+      const newFolderCard = `
+        <div class="folder-card" id="folder-card-${folderName}" onclick="filterByFolder('${folderName}')">
+          <button class="btn-delete-folder" onclick="deleteFolder(event, '${folderName}')" title="Delete Folder">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+          <i class="fa-solid fa-folder-open folder-icon" style="color: ${folderColor};"></i>
+          <h3>${folderName}</h3>
+          <p style="color:#64748b; font-size:0.85rem; margin-top:0.2rem;" id="count-${folderName}">0 Shortened Links</p>
+        </div>
+      `;
+      folderGrid.insertAdjacentHTML('beforeend', newFolderCard);
+
+      const folderSelect = document.getElementById('folder-select');
+      const newOption = document.createElement('option');
+      newOption.value = folderName;
+      newOption.textContent = folderName;
+      folderSelect.appendChild(newOption);
+
+      alert(`Folder "${folderName}" created successfully!`);
+      e.target.reset();
+    }
+
+    function handleCreateLink(e) {
+      e.preventDefault();
+      const targetUrl = document.getElementById('target-url').value;
+      const alias = document.getElementById('custom-alias').value;
+      const folder = document.getElementById('folder-select').value;
+      const linkId = 'link-' + Date.now();
+
+      linksData[linkId] = {
+        alias: `urlzen.com/${alias}`,
+        countries: {}
+      };
+
+      const newRow = `
+        <tr data-id="${linkId}" data-folder="${folder}">
+          <td><span class="link-short" onclick="openAnalytics('${linkId}')">urlzen.com/${alias}</span></td>
+          <td class="link-long">${targetUrl}</td>
+          <td><strong id="clicks-${linkId}">0</strong></td>
+          <td><i class="fa-solid fa-location-dot"></i> <span id="top-${linkId}">No clicks yet</span></td>
+          <td><span class="badge-folder" onclick="filterByFolder('${folder}')"><i class="fa-solid fa-folder"></i> ${folder}</span></td>
+          <td style="text-align: center;">
+            <button class="btn-delete-link" onclick="deleteLink('${linkId}')" title="Delete Short Link">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </td>
+        </tr>
+      `;
+
+      document.getElementById('links-table-body').insertAdjacentHTML('afterbegin', newRow);
+      updateFolderCount(folder);
+      showAllLinks();
+
+      alert(`Success! Created custom link: urlzen.com/${alias}`);
+      e.target.reset();
+    }
+
+    function handleUpdateProfile(e) {
+      e.preventDefault();
+      const newUsername = document.getElementById('setting-username').value;
+      document.getElementById('display-username').innerText = newUsername;
+      alert('Account credentials updated!');
+    }
+
+    function handleDeleteAccount() {
+      if (confirm('Are you sure you want to delete your account? This action is permanent.')) {
+        alert('Account deleted.');
+        window.location.href = 'index.html';
+      }
+    }
+
+    function handleLogout() {
+      if (confirm('Are you sure you want to log out?')) {
+        window.location.href = 'login.html';
+      }
+    }
+  </script>
+
+</body>
+</html>

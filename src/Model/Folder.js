@@ -17,25 +17,15 @@ const schema = new Schema({
         unique: true,
         index: true
     },
-    Link: {
+    Name: {
         type: String,
-        required: true,
+        required: true
     },
-    Shortend: {
+    Color: {
         type: String,
-        required: true,
-    },
-    Clicks: {
-        type: Number,
-        required: true,
-    },
-    Country: {
-        type: String,
-        required: true,
-    },
-    Created: true,
-    
+        required: true
+    }
 })
 
 
-module.exports = database.model("link", schema)
+module.exports = database.model("folder", schema)

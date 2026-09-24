@@ -1,12 +1,23 @@
 {
   "name": "linkshorten",
   "version": "1.0.0",
-  "description": "An url shortener",
+  "description": "An URL Shorten website",
+  "homepage": "https://github.com/TechCoderCraft/LinkShorten#readme",
+  "bugs": {
+    "url": "https://github.com/TechCoderCraft/LinkShorten/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TechCoderCraft/LinkShorten.git"
+  },
   "license": "ISC",
   "author": "Github / TechCoderCraft",
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "mongoose": "^9.10.2"
   }
 }

@@ -1,2 +1,6 @@
+const crypto = require("crypto")
 
-urlzen.io
+const key = crypto.randomBytes(32).toString("base64")
+
+console.log(key)
+//urlzen.io
